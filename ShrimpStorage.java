@@ -5,19 +5,22 @@ import java.io.IOException;
 
 public class ShrimpStorage {
 
-  
   private static final byte[] MAGIC_BYTES = {0x53, 0x48, 0x4d};
   
-  public static void saveFile(String fileName, byte[] data) throws IOException {
+  public static void saveFile(String fileName, byte[] data, boolean asHex) throws IOException {
     if (!fileName.endsWith(".shrimp")){
       fileName += ".shrimp";
     }
-
+    
     try (FileOutputStream fos = new FileOutputStream(fileName)){
       fos.write(MAGIC_BYTES);
-      fos.write(data);
 
-      System.out.println("Successfully saved file as:" + fileName);
+      if (asHex){
+        String hexData = ShrimpCore.bytesToHex(data);
+        fos.write(hexData.getBytes());
+      } else {
+        fos.write(data);
+      }
     } catch (IOException e){
       System.out.println("Failed to save file:" + fileName);
       System.out.println("With Error: " + e.getMessage());
@@ -33,13 +36,22 @@ public class ShrimpStorage {
       throw new IOException("File is too small to be a valid .shrimp file");
     }
 
-    byte[] fileData = new byte[(int) file.length()];
+    byte[] fileData = new byte[(int) file.length() - MAGIC_BYTES.length];
 
-    try (java.io.FileInputStream fis = new java.io.FileInputStream(file)){
+    try (FileInputStream fis = new FileInputStream(file)){
       byte[] header = new byte[MAGIC_BYTES.length];
-      fis.read(fileData);
-
       fis.read(header);
+      fis.read(fileData);
+    }
+    return fileData;
+  }
+
+  public static byte[] loadPlainFile(String path) throws IOException {
+    File file = new File(path);
+    byte[] fileData = new byte[(int) file.length()];
+    
+    try (FileInputStream fis = new FileInputStream(file)) {
+        fis.read(fileData);
     }
     return fileData;
   }

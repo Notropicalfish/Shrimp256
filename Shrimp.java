@@ -2,8 +2,8 @@ import java.util.Scanner;
 
 public class Shrimp {
 
-  private static final String VERSION = "v0.4.154";
-  private static final String CODENAME = "ENCRIPT";
+  private static final String VERSION = "v1.0.0";
+  private static final String CODENAME = "ONEMILLIONMONSTER";
 
   public static void main(String[] args){
     Scanner scanner = new Scanner(System.in);
@@ -11,9 +11,11 @@ public class Shrimp {
     printHeader();
     System.out.println("Shrimp Encryption/Decription Tool");
     System.out.println("Press Enter to start: ");
+    scanner.nextLine();
 
     System.out.println("Enter Secret Key:");
     String key = scanner.nextLine();
+    System.out.println("Key entered: '" + key + "' (length: " + key.length() + ")");
     System.out.println("Shrimp256 Initilized");
 
     System.out.println("Enter target filename:");
@@ -25,58 +27,54 @@ public class Shrimp {
     System.out.println("<---Select Input Method--->");
     System.out.println("1. Manual Text Entry");
     System.out.println("2. Load .txt File");
-    System.out.println("3. Load .hpr60 FIle (Decrypt)");
+    System.out.println("3. Load .shrimp File (Decrypt)");
     System.out.println("Enter a number to select method");
     System.out.println("Selection:");
 
     String choice = scanner.nextLine();
-    byte[] inputData = null;
-
-    switch (choice){
-      case "1":
-        System.out.println("Enter text: ");
-        inputData = scanner.nextLine().getBytes();
-        break;
-    case "2":
-    case "3":
-      System.out.println("Enter file path: ");
-      String path = scanner.nextLine();
-      try {
-        inputData = ShrimpStorage.loadFile(path);
-      } catch (java.io.IOException e){
-        System.out.println("file not found!");
-        return;
-      }
-      break;
-    default:
-      System.out.println("Invalid choice. Exiting");
-      return;
-    }
-    
-    System.out.println("Setup Complete Ready for engine");
-    byte[] outputData;
-
-    if (choice.equals("3")){
-      outputData = ShrimpCore.decryptBlock(inputData, key, 256, 8);
-      System.out.println("Decrypted" + new String(outputData));
-    } else {
-      outputData = ShrimpCore.encryptBlock(inputData, key, 256);
-      System.out.println("DEBUG RAW BYTES: " + ShrimpCore.bytesToHex(outputData));
-      System.out.println("Encryption applied");
-    }
-    
     String finalName = baseName;
     if (timeChoice.equalsIgnoreCase("y")){
       String ts = new java.text.SimpleDateFormat("yyyyMMdd_HHmm").format(new java.util.Date());
       finalName = baseName + "_" + ts;
     }
+
+    byte[] inputData = null;
     
-    try{
-    ShrimpStorage.saveFile(finalName, outputData);
-    System.out.println("File Saved💥💥💥💥💥💥💥💥");
-    } catch (java.io.IOException e){
-      System.out.println("failed t save file");
-      System.out.println("Deatils: " + e.getMessage());
+    byte[] outputData;
+    
+    try {
+      if (choice.equals("1")) {
+        System.out.println("Enter text: ");
+        inputData = scanner.nextLine().getBytes();
+      } else if (choice.equals("2")) {
+        System.out.println("Enter file path: ");
+        inputData = ShrimpStorage.loadPlainFile(scanner.nextLine());
+      } else if (choice.equals("3")) {
+        System.out.println("Enter file path: ");
+        inputData = ShrimpStorage.loadFile(scanner.nextLine());
+      }
+      
+      if (inputData != null) {
+        System.out.println("Input data hex: " + ShrimpCore.bytesToHex(inputData));
+        System.out.println("Setup Complete Ready for engine");
+      }
+
+      if (choice.equals("3")) {
+        String hexInput = new String(inputData);
+        byte[] rawEncrypted = ShrimpCore.hexToBytes(hexInput);
+        outputData = ShrimpCore.decryptBlock(rawEncrypted, key, 256);
+        
+        ShrimpStorage.saveFile(finalName + ".txt", outputData, false);
+        System.out.println("Decrypted! Saved as " + finalName + ".txt");
+      } else {
+        outputData = ShrimpCore.encryptBlock(inputData, key, 256);
+        
+        ShrimpStorage.saveFile(finalName + ".shrimp", outputData, true);
+        System.out.println("Encrypted! Saved as " + finalName + ".shrimp");
+      }
+
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
     }
   }
 
