@@ -8,9 +8,8 @@
 ![Made by](https://img.shields.io/badge/made%20by-Crunch%20Impposible-red.svg)
 ![Written in](https://img.shields.io/badge/written%20in-Java-orange.svg)
 
-** Custom made Encryption and Decryption method and tool! **
+* *A command-line tool for encrypting and decrypting files using my Shrimp256 algorithm. **
 
-A command-line tool for encrypting and decrypting files using the Shrimp256 algorithm.
 </div>
 ## Features
 
