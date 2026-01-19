@@ -10,10 +10,8 @@
 
 ** Custom made Encryption and Decryption method and tool! **
 
-</div>
-
 A command-line tool for encrypting and decrypting files using the Shrimp256 algorithm.
-
+</div>
 ## Features
 
 *   **Encryption and Decryption:** Securely encrypt and decrypt your files.
