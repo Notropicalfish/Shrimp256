@@ -1,4 +1,4 @@
-# Shrimp Encryption/Decryption Tool
+# 🍤 Shrimp Encryption/Decryption Tool
 
 <div align="center">
 
